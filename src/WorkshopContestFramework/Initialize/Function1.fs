@@ -12,8 +12,28 @@ open Microsoft.Azure.WebJobs.Extensions.Http;
 open Microsoft.AspNetCore.Http;
 open Microsoft.Extensions.Logging;
 open Microsoft.WindowsAzure.Storage
+open Microsoft.WindowsAzure.Storage.Table
+open Newtonsoft.Json
+
+type Payload = {
+   users: string[]
+}
+
+type User(email: string, password: string)  =
+    inherit TableEntity("workshop", email)
+    member val Password = password with get, set
+    member val Score = 0 with get, set
 
 module Function1 =
+    let randomStr = 
+        let chars = "ABCDEFGHIJKLMNOPQRSTUVWUXYZ0123456789"
+        let charsLen = chars.Length
+        let random = System.Random()
+
+        fun len -> 
+            let randomChars = [|for i in 0..len -> chars.[random.Next(charsLen)]|]
+            new System.String(randomChars)
+
     [<FunctionName("Initialize")>]
     let Run ([<HttpTrigger(AuthorizationLevel.Function, [|"post"|])>] req: HttpRequest) (log: ILogger) = 
         async {
@@ -21,6 +41,8 @@ module Function1 =
             
             let storageAccount = CloudStorageAccount.Parse connectionString
             let tableClient = storageAccount.CreateCloudTableClient ()
+
+            //1. Create Tables
 
             let createTable name = 
                 let table = tableClient.GetTableReference name
@@ -30,7 +52,24 @@ module Function1 =
                             |> Seq.ofArray
                             |> Seq.map createTable 
                             |> Async.Parallel
+
             
-            return "done !" 
+            // 2. Create or Merge users
+
+            let reader = new StreamReader(req.Body)
+            let! payloadStr = reader.ReadToEndAsync() |> Async.AwaitTask
+            let payload = JsonConvert.DeserializeObject<Payload>(payloadStr)
+
+            let users = tableClient.GetTableReference "users"
+            let batchOperation = new TableBatchOperation()
+
+            payload.users 
+                |> Array.map(fun u -> new User(u, randomStr 15))
+                |> Array.iter(fun u -> TableOperation.InsertOrMerge u |> batchOperation.Add)
+
+            let! result = users.ExecuteBatchAsync batchOperation |> Async.AwaitTask
+                               
+            
+            return "done !"
         }
         |> Async.StartAsTask

@@ -1,0 +1,28 @@
+{
+    "challenges": [
+        {
+            "order": 1,
+            "title": "Kraków",
+            "body": "Mając dane api podać sumę id-ków dla stacji z Krakowa",
+            "answer": "the answers is 16",
+            "hints": [
+                {
+                    "question": "jak filtrować",
+                    "answer": "użyć Seq.filter"
+                }
+            ]
+        },
+        {
+            "order": 2,
+            "title": "AGH",
+            "body": "Podać sumę id dla trzech stacji najbliższych AGH",
+            "answer": "the answer is 87",
+            "hints": [
+                {
+                    "question": "jak wyliczyć odległość do AGH",
+                    "answer": "użyć euklidesowej"
+                }
+            ]
+        }
+    ]
+}

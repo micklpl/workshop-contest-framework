@@ -15,10 +15,14 @@ open Microsoft.Extensions.Logging;
 open Microsoft.WindowsAzure.Storage
 open Newtonsoft.Json
 open Microsoft.WindowsAzure.Storage.Table
+open FSharp.Data
 
 type Payload = {
    users: string[]
 }
+
+type Metadata = JsonProvider<"https://wcfsdevtorage.blob.core.windows.net/common/metadata-template.json?st=2019-02-09T14%3A24%3A04Z&se=2029-02-10T14%3A24%3A00Z&sp=r&sv=2018-03-28&sr=b&sig=EdoP7Yhe0AP3AqkjsIMGJSqI2SwKxwBMz8B6EHWqPqI%3D">
+
 
 module Initialize =
     let randomStr = 
@@ -44,7 +48,7 @@ module Initialize =
                 let table = tableClient.GetTableReference name
                 table.CreateIfNotExistsAsync() |> Async.AwaitTask
     
-            let! result = [| "users"; "attemps"; "answers"; "permissions"; "hints" |]
+            let! result = [| "users"; "challenges"; "attemps"; "answers"; "permissions"; "hints" |]
                             |> Seq.ofArray
                             |> Seq.map createTable 
                             |> Async.Parallel
@@ -57,14 +61,27 @@ module Initialize =
             let payload = JsonConvert.DeserializeObject<Payload>(payloadStr)
 
             let users = tableClient.GetTableReference "users"            
-            let batchOperation = new TableBatchOperation()
+            let usersBatch = new TableBatchOperation()
 
             payload.users 
-                |> Array.map(fun u -> new User(u, randomStr 15))
-                |> Array.iter(fun u -> TableOperation.InsertOrMerge u |> batchOperation.Add)
+                |> Array.map(fun u -> new User(u, randomStr 16))
+                |> Array.iter(fun u -> TableOperation.InsertOrMerge u |> usersBatch.Add)
 
-            let! result = users.ExecuteBatchAsync batchOperation |> Async.AwaitTask
-                               
+            let! usersResult = users.ExecuteBatchAsync usersBatch |> Async.AwaitTask
+
+            // 3. Initialize Content
+
+            let metadataUrl = Environment.GetEnvironmentVariable "ContestMetadata"
+            let metadata = Metadata.Load metadataUrl
+
+            let challenges = tableClient.GetTableReference "challenges"            
+            let challengesBatch = new TableBatchOperation()
+
+            metadata.Challenges
+                |> Array.map(fun c -> new Challenge(c.Order, randomStr 32, c.Answer, c.Title))
+                |> Array.iter(fun u -> TableOperation.InsertOrMerge u |> challengesBatch.Add)
+
+            let! challengesResult = challenges.ExecuteBatchAsync challengesBatch |> Async.AwaitTask
             
             return "done !"
         }

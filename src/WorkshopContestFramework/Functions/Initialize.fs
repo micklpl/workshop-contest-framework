@@ -3,28 +3,24 @@ namespace FunctionApp1
 open System
 open Microsoft.Azure.WebJobs
 open Microsoft.Azure.WebJobs.Host
-open System;
+open System
+open Common
 open System.IO;
-open System.Threading.Tasks;
-open Microsoft.AspNetCore.Mvc;
-open Microsoft.Azure.WebJobs;
-open Microsoft.Azure.WebJobs.Extensions.Http;
-open Microsoft.AspNetCore.Http;
+open System.Threading.Tasks
+open Microsoft.AspNetCore.Mvc
+open Microsoft.Azure.WebJobs
+open Microsoft.Azure.WebJobs.Extensions.Http
+open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Logging;
 open Microsoft.WindowsAzure.Storage
-open Microsoft.WindowsAzure.Storage.Table
 open Newtonsoft.Json
+open Microsoft.WindowsAzure.Storage.Table
 
 type Payload = {
    users: string[]
 }
 
-type User(email: string, password: string)  =
-    inherit TableEntity("workshop", email)
-    member val Password = password with get, set
-    member val Score = 0 with get, set
-
-module Function1 =
+module Initialize =
     let randomStr = 
         let chars = "ABCDEFGHIJKLMNOPQRSTUVWUXYZ0123456789"
         let charsLen = chars.Length

@@ -5,6 +5,8 @@ open Microsoft.Azure.WebJobs
 open Microsoft.Azure.WebJobs.Host
 open System;
 open System.IO;
+open System.Net;
+open System.Net.Http.Headers;
 open System.Threading.Tasks;
 open Microsoft.AspNetCore.Mvc;
 open Microsoft.Azure.WebJobs;
@@ -34,6 +36,20 @@ module Main =
                                  
             let user = retrievedResult.Result :?> User
 
-            return user.Email
+            let cloudBlobClient = storageAccount.CreateCloudBlobClient()
+            let common = cloudBlobClient.GetContainerReference "common"
+            let blob = common.GetBlobReference "main.html"
+
+            use memoryStream = new MemoryStream()
+            do! blob.DownloadToStreamAsync memoryStream |> Async.AwaitTask
+            let bytes = memoryStream.ToArray()
+            let content = System.Text.Encoding.UTF8.GetString(bytes)
+
+            let compiledContent = content.Replace("{{ email }}", user.Email).Replace("{{ score }}", user.Score.ToString())
+
+            let response = new ContentResult();
+            response.Content <- compiledContent;
+            response.ContentType <- "text/html";
+            return response;
         }
         |> Async.StartAsTask

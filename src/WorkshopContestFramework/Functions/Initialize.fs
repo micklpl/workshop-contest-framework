@@ -60,7 +60,7 @@ module Function1 =
             let! payloadStr = reader.ReadToEndAsync() |> Async.AwaitTask
             let payload = JsonConvert.DeserializeObject<Payload>(payloadStr)
 
-            let users = tableClient.GetTableReference "users"
+            let users = tableClient.GetTableReference "users"            
             let batchOperation = new TableBatchOperation()
 
             payload.users 

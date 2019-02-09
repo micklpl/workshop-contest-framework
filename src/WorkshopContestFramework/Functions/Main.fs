@@ -25,29 +25,14 @@ module Main =
             let authenticationKey = req.Query.["key"] |> Seq.head
             "Received request for " + authenticationKey |> log.LogInformation
 
-            let connectionString = Environment.GetEnvironmentVariable "StorageConnectionString"
-
-            let storageAccount = CloudStorageAccount.Parse connectionString
-            let tableClient = storageAccount.CreateCloudTableClient ()
-            let users = tableClient.GetTableReference "users" 
-
-            let retrieveOperation = TableOperation.Retrieve<User>("workshop", authenticationKey);
-            let! retrievedResult = users.ExecuteAsync retrieveOperation |> Async.AwaitTask
-                                 
-            let user = retrievedResult.Result :?> User
-
-            let cloudBlobClient = storageAccount.CreateCloudBlobClient()
-            let common = cloudBlobClient.GetContainerReference "common"
-            let blob = common.GetBlobReference "main.html"
-
-            use memoryStream = new MemoryStream()
-            do! blob.DownloadToStreamAsync memoryStream |> Async.AwaitTask
-            let bytes = memoryStream.ToArray()
-            let content = System.Text.Encoding.UTF8.GetString(bytes)
+            let! user = getUserByKey authenticationKey
+            let! content = getHtml ("common", "main.html")
 
             let compiledContent = content.Replace("{{ email }}", user.Email).Replace("{{ score }}", user.Score.ToString())
 
             // challenges
+            let storageAccount = createStorageAccount()
+            let tableClient = storageAccount.CreateCloudTableClient ()
             let challenges = tableClient.GetTableReference "challenges"
             let query =
                 TableQuery<Challenge>().Where(

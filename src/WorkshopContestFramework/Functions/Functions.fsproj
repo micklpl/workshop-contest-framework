@@ -12,6 +12,7 @@
   <ItemGroup>
     <Compile Include="Common.fs" />
     <Compile Include="Hint.fs" />
+    <Compile Include="Results.fs" />
     <Compile Include="Submit.fs" />
     <Compile Include="Puzzle.fs" />
     <Compile Include="Main.fs" />

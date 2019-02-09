@@ -38,7 +38,7 @@ module Main =
                         "PartitionKey", QueryComparisons.Equal, "workshop"))
 
             let! allChallenges = challenges.ExecuteQuerySegmentedAsync(query, null) |> Async.AwaitTask
-            
+
             let baseUrl = Environment.GetEnvironmentVariable "BaseUrl"
             let userChallenges = allChallenges.Results
                                     |> Seq.filter(fun c -> c.Level <= user.Level)

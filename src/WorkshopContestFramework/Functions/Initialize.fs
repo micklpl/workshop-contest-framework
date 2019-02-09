@@ -21,15 +21,7 @@ type Payload = {
    users: string[]
 }
 
-module Initialize =
-    let randomStr = 
-        let chars = "ABCDEFGHIJKLMNOPQRSTUVWUXYZ0123456789"
-        let charsLen = chars.Length
-        let random = System.Random()
-
-        fun len -> 
-            let randomChars = [|for i in 0..len -> chars.[random.Next(charsLen)]|]
-            new System.String(randomChars)
+module Initialize =   
 
     [<FunctionName("Initialize")>]
     let Run ([<HttpTrigger(AuthorizationLevel.Function, [|"post"|])>] req: HttpRequest) (log: ILogger) = 

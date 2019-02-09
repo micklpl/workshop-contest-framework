@@ -35,6 +35,8 @@ module Puzzle =
             
             let compiledContent = content.Replace("{{ title }}", challengeContent.Title)
                                          .Replace("{{ body }}", challengeContent.Body)
+                                         .Replace("{{ key }}", authenticationKey)
+                                         .Replace("{{ riddleId }}", riddleId)
            
             let response = new ContentResult();
             response.Content <- compiledContent;

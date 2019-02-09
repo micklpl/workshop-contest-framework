@@ -45,7 +45,7 @@ module Initialize =
                 let table = tableClient.GetTableReference name
                 table.CreateIfNotExistsAsync() |> Async.AwaitTask
     
-            let! result = [| "users"; "challenges"; "attemps"; "answers"; "permissions"; "hints" |]
+            let! result = [| "users"; "challenges"; "answers"; "permissions"; "hints" |]
                             |> Seq.ofArray
                             |> Seq.map createTable 
                             |> Async.Parallel

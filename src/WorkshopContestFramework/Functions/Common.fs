@@ -30,6 +30,7 @@
         new() = Challenge(0, null, null, null)
         member val Level = level with get, set
         member val Title = title with get, set
+        member val Answer = answer with get, set
 
     type Metadata = JsonProvider<"https://wcfsdevtorage.blob.core.windows.net/common/metadata-template.json?st=2019-02-09T14%3A24%3A04Z&se=2029-02-10T14%3A24%3A00Z&sp=r&sv=2018-03-28&sr=b&sig=EdoP7Yhe0AP3AqkjsIMGJSqI2SwKxwBMz8B6EHWqPqI%3D">
 

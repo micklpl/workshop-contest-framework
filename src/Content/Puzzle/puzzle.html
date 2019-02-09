@@ -21,12 +21,39 @@
             </div>
         </div>
         <div class="container">
-            <h3>Available hints:</h3>
+            <form action="/api/Submit" method="POST">
+                <div class="form-group">
+                    <label for="answer">Answer</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="answer"
+                        name="answer"
+                        placeholder="Please enter correct answer"
+                    />
+                    <input
+                        type="hidden"
+                        id="key"
+                        name="key"
+                        value="{{ key }}"
+                    />
+                    <input
+                        type="hidden"
+                        id="riddleId"
+                        name="riddleId"
+                        value="{{ riddleId }}"
+                    />
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <div class="container">
+            <h5>Available hints:</h5>
         </div>
         <br />
         <div class="container">
             <div class="list-group">
-                {{ challenges }}
+                {{ hints }}
             </div>
         </div>
     </body>

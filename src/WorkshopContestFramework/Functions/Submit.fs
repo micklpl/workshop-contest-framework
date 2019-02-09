@@ -46,7 +46,7 @@ module Submit =
                                          |> Seq.map(fun s -> s.UserId)
                                          |> List.ofSeq
 
-            let score = match (isCorrect, correctAnswers) with
+            let scoreUp = match (isCorrect, correctAnswers) with
                             | (false, _) -> -1
                             | (true, x) when x |> List.exists (fun elem -> elem = authenticationKey) -> 0
                             | (true, [ ] ) -> 4
@@ -54,7 +54,10 @@ module Submit =
                             | (true, [ _ ; _ ] ) -> 2
                             | ( _, _ ) -> 1
 
-            user.Score <- user.Score + score
+            let levelUp = if scoreUp > 0 then 1 else 0
+
+            user.Score <- user.Score + scoreUp
+            user.Level <- user.Level + levelUp
             let! result = replaceEntity("users", user)   
             
             let answer = new Answer(riddleId, answer, randomStr 10, isCorrect, authenticationKey)

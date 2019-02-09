@@ -33,10 +33,16 @@ module Puzzle =
 
             let challengeContent = contestMetadata.Challenges |> Seq.find(fun c -> c.Order = challenge.Level)
             
+            let baseUrl = Environment.GetEnvironmentVariable "BaseUrl"
+            let hints = challengeContent.Hints
+                            |> Seq.mapi(fun i el -> String.Format("<a target=\"blank\" href=\"{0}Hint?id={1}&key={2}&challengeId={4}\" class=\"list-group-item list-group-item-action\">{3}</a>", baseUrl, i, authenticationKey, el.Question, challengeContent.Order))
+
+
             let compiledContent = content.Replace("{{ title }}", challengeContent.Title)
                                          .Replace("{{ body }}", challengeContent.Body)
                                          .Replace("{{ key }}", authenticationKey)
                                          .Replace("{{ riddleId }}", riddleId)
+                                         .Replace("{{ hints }}", hints |> String.concat "")
            
             let response = new ContentResult();
             response.Content <- compiledContent;

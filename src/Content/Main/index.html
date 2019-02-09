@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Bootstrap Example</title>
+        <title>F# Workshop Contest</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link
@@ -15,7 +15,10 @@
         <div class="container">
             <div class="jumbotron">
                 <h1>F# Basics Workshop Contest</h1>
-                <p>Hello {{ email }}, your current score is {{ score }}</p>
+                <p>
+                    Hello <b>{{ email }}</b
+                    >, your current score is <b>{{ score }}</b>
+                </p>
             </div>
         </div>
         <div class="container">
@@ -24,21 +27,7 @@
         <br />
         <div class="container">
             <div class="list-group">
-                <a href="#" class="list-group-item list-group-item-action">
-                    Cras justo odio
-                </a>
-                <a href="#" class="list-group-item list-group-item-action"
-                    >Dapibus ac facilisis in</a
-                >
-                <a href="#" class="list-group-item list-group-item-action"
-                    >Morbi leo risus</a
-                >
-                <a href="#" class="list-group-item list-group-item-action"
-                    >Porta ac consectetur ac</a
-                >
-                <a href="#" class="list-group-item list-group-item-action"
-                    >Vestibulum at eros</a
-                >
+                {{ challenges }}
             </div>
         </div>
     </body>

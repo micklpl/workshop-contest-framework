@@ -47,6 +47,23 @@ module Main =
 
             let compiledContent = content.Replace("{{ email }}", user.Email).Replace("{{ score }}", user.Score.ToString())
 
+            // challenges
+            let challenges = tableClient.GetTableReference "challenges"
+            let query =
+                TableQuery<Challenge>().Where(
+                    TableQuery.GenerateFilterCondition(
+                        "PartitionKey", QueryComparisons.Equal, "workshop"))
+
+            let! allChallenges = challenges.ExecuteQuerySegmentedAsync(query, null) |> Async.AwaitTask
+            
+            let userChallenges = allChallenges.Results
+                                    |> Seq.filter(fun c -> c.Level <= user.Level)
+                                    |> Seq.map(fun c -> String.Format("<a href=\"#\" class=\"list-group-item list-group-item-action\">{0}</a>", c.Title))
+
+            let compiledContent = content.Replace("{{ email }}", user.Email)
+                                         .Replace("{{ score }}", user.Score.ToString())
+                                         .Replace("{{ challenges }}", userChallenges |> String.concat "")
+           
             let response = new ContentResult();
             response.Content <- compiledContent;
             response.ContentType <- "text/html";

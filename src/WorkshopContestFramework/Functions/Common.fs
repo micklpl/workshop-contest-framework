@@ -16,6 +16,7 @@
     open Microsoft.WindowsAzure.Storage
     open Microsoft.WindowsAzure.Storage.Table
     open Newtonsoft.Json
+    open FSharp.Data
 
     type User(email: string, password: string)  =
         inherit TableEntity("workshop", password)
@@ -30,21 +31,36 @@
         member val Level = level with get, set
         member val Title = title with get, set
 
+    type Metadata = JsonProvider<"https://wcfsdevtorage.blob.core.windows.net/common/metadata-template.json?st=2019-02-09T14%3A24%3A04Z&se=2029-02-10T14%3A24%3A00Z&sp=r&sv=2018-03-28&sr=b&sig=EdoP7Yhe0AP3AqkjsIMGJSqI2SwKxwBMz8B6EHWqPqI%3D">
+
     let createStorageAccount () =
         let connectionString = Environment.GetEnvironmentVariable "StorageConnectionString"
         CloudStorageAccount.Parse connectionString
 
-    let getUserByKey key =
+    let retrieveEntity<'T when 'T :> ITableEntity> (tableName, key) =
         async {
             let storageAccount = createStorageAccount()
             let tableClient = storageAccount.CreateCloudTableClient ()
-            let users = tableClient.GetTableReference "users" 
+            let users = tableClient.GetTableReference tableName 
 
-            let retrieveOperation = TableOperation.Retrieve<User>("workshop", key);
+            let retrieveOperation = TableOperation.Retrieve<'T>("workshop", key);
             let! retrievedResult = users.ExecuteAsync retrieveOperation |> Async.AwaitTask
-                                 
-            let user = retrievedResult.Result :?> User
 
+            return retrievedResult
+        }
+        
+
+    let getUserByKey key =
+        async {
+            let! retrievedResult = retrieveEntity<User>("users", key)                                 
+            let user = retrievedResult.Result :?> User
+            return user
+        }
+
+    let getChallengeByKey key =
+        async {
+            let! retrievedResult = retrieveEntity<Challenge>("challenges", key)                                 
+            let user = retrievedResult.Result :?> Challenge
             return user
         }
 

@@ -27,9 +27,7 @@ module Main =
 
             let! user = getUserByKey authenticationKey
             let! content = getHtml ("common", "main.html")
-
-            let compiledContent = content.Replace("{{ email }}", user.Email).Replace("{{ score }}", user.Score.ToString())
-
+            
             // challenges
             let storageAccount = createStorageAccount()
             let tableClient = storageAccount.CreateCloudTableClient ()
@@ -41,9 +39,10 @@ module Main =
 
             let! allChallenges = challenges.ExecuteQuerySegmentedAsync(query, null) |> Async.AwaitTask
             
+            let baseUrl = Environment.GetEnvironmentVariable "BaseUrl"
             let userChallenges = allChallenges.Results
                                     |> Seq.filter(fun c -> c.Level <= user.Level)
-                                    |> Seq.map(fun c -> String.Format("<a href=\"#\" class=\"list-group-item list-group-item-action\">{0}</a>", c.Title))
+                                    |> Seq.map(fun c -> String.Format("<a href=\"{1}Puzzle?id={2}&key={3}\" class=\"list-group-item list-group-item-action\">{0}</a>", c.Title, baseUrl, c.RowKey, authenticationKey))
 
             let compiledContent = content.Replace("{{ email }}", user.Email)
                                          .Replace("{{ score }}", user.Score.ToString())

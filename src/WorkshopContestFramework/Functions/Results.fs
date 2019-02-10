@@ -22,15 +22,7 @@ module Results =
     [<FunctionName("Results")>]
     let Run ([<HttpTrigger(AuthorizationLevel.Function, [|"get"|])>] req: HttpRequest) (log: ILogger) = 
         async {
-            let storageAccount = createStorageAccount()
-            let tableClient = storageAccount.CreateCloudTableClient ()
-            let challenges = tableClient.GetTableReference "users"
-            let usersQuery =
-                TableQuery<User>().Where(
-                    TableQuery.GenerateFilterCondition(
-                        "PartitionKey", QueryComparisons.Equal, "workshop"))
-
-            let! users = challenges.ExecuteQuerySegmentedAsync(usersQuery, null) |> Async.AwaitTask
+            let! users = getAllUsers()
             
             let usersTable = users |> Seq.sortByDescending(fun s -> s.Score)
                                    |> Seq.mapi(fun i el -> String.Format("<tr><th scope=\"row\">{0}</th><td>{1}</td><td>{2}</td></tr>", i + 1, el.Email, el.Score))

@@ -7,11 +7,13 @@
     <PackageReference Include="FSharp.Data" Version="3.0.0" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.24" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Sendgrid" Version="9.10.0" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common.fs" />
     <Compile Include="Hint.fs" />
+    <Compile Include="Start.fs" />
     <Compile Include="Results.fs" />
     <Compile Include="Submit.fs" />
     <Compile Include="Puzzle.fs" />

@@ -119,3 +119,17 @@
 
             return ()
         }
+
+    let getAllUsers() =
+        async{
+            let storageAccount = createStorageAccount()
+            let tableClient = storageAccount.CreateCloudTableClient ()
+            let challenges = tableClient.GetTableReference "users"
+            let usersQuery =
+                TableQuery<User>().Where(
+                    TableQuery.GenerateFilterCondition(
+                        "PartitionKey", QueryComparisons.Equal, "workshop"))
+
+            let! users = challenges.ExecuteQuerySegmentedAsync(usersQuery, null) |> Async.AwaitTask
+            return users
+        }

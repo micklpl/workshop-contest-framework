@@ -28,7 +28,7 @@ module Hint =
             
             let contestMetadata = Environment.GetEnvironmentVariable "ContestMetadata" |> Metadata.Load
 
-            let hint = contestMetadata.Challenges.[challengeId].Hints.[hintId]
+            let hint = contestMetadata.Challenges.[challengeId - 1].Hints.[hintId]
 
             let! user = getUserByKey authenticationKey
             user.Score <- user.Score - 1

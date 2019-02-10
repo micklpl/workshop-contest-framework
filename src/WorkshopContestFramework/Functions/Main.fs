@@ -42,6 +42,7 @@ module Main =
             let baseUrl = Environment.GetEnvironmentVariable "BaseUrl"
             let userChallenges = allChallenges.Results
                                     |> Seq.filter(fun c -> c.Level <= user.Level)
+                                    |> Seq.sortBy(fun c -> c.Level)
                                     |> Seq.map(fun c -> String.Format("<a href=\"{1}Puzzle?id={2}&key={3}\" class=\"list-group-item list-group-item-action\">{0}</a>", c.Title, baseUrl, c.RowKey, authenticationKey))
 
             let compiledContent = content.Replace("{{ email }}", user.Email)
